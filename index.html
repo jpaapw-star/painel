@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Painéis EmanX</title>
+<link rel="icon" href="favicon.png" />
+<meta name="theme-color" content="#111113" />
+<style>
+  html, body { margin: 0; height: 100%; background: #111113; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+</style>
+</head>
+<body>
+<!--
+  Página própria do painel: mostra o app do Apps Script por inteiro, sem a faixa do Google no topo,
+  e cuida da tela cheia do "Modo exibição". Não guarda dado nenhum: só o endereço do app.
+  URL_DO_APP é trocado na publicação pelo endereço .../exec.
+-->
+<iframe id="painel" title="Painéis EmanX" allow="fullscreen; clipboard-write" allowfullscreen></iframe>
+<script>
+(function () {
+  var URL_DO_APP = 'https://script.google.com/macros/s/AKfycbyJH0Poi1gjWuChr36g5HuHNby_Xep6VPi1Nj16BxaLJsFH0rrpAS1fzVBBtXQdjSWKww/exec';
+  var p = (new URLSearchParams(location.search).get('p') || 'producao').replace(/[^a-z]/g, '');
+  var quadro = document.getElementById('painel');
+  quadro.src = URL_DO_APP + '?p=' + p + '&embutido=1';
+
+  // manda um recado para o app (que fica alguns quadros para dentro)
+  function espalhar(janela, recado) {
+    try { janela.postMessage(recado, '*'); } catch (e) { /* segue */ }
+    try { for (var i = 0; i < janela.length; i++) espalhar(janela[i], recado); } catch (e) { /* segue */ }
+  }
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data;
+    if (!d || d.emanx !== 'telacheia') return;
+    var raiz = document.documentElement;
+    if (d.ligar) {
+      var pedir = raiz.requestFullscreen || raiz.webkitRequestFullscreen;
+      if (pedir) { try { var r = pedir.call(raiz); if (r && r.catch) r.catch(function () {}); } catch (e) { /* segue em janela */ } }
+    } else if (document.fullscreenElement || document.webkitFullscreenElement) {
+      var sair = document.exitFullscreen || document.webkitExitFullscreen;
+      if (sair) { try { var s = sair.call(document); if (s && s.catch) s.catch(function () {}); } catch (e) { /* segue */ } }
+    }
+  });
+  function mudou() {
+    if (!(document.fullscreenElement || document.webkitFullscreenElement)) espalhar(quadro.contentWindow, { emanx: 'telacheia-saiu' });
+  }
+  document.addEventListener('fullscreenchange', mudou);
+  document.addEventListener('webkitfullscreenchange', mudou);
+})();
+</script>
+</body>
+</html>
