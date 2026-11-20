@@ -5,20 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Meus apps</title>
-<link rel="icon" href="../favicon.png" />
-<link rel="apple-touch-icon" href="../favicon.png" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icone-192.png" />
+<link rel="apple-touch-icon" href="icone-180.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Meus apps" />
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
 <style>
   :root {
     --fundo: #f5f5f7; --cartao: #ffffff; --borda: #e3e3e6; --texto: #1d1d1f; --suave: #6e6e73;
-    --icone-fundo: #1d1d1f; --icone: #ffffff; --sombra: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+    --icone-fundo: #1d1d1f; --icone: #ffffff; --vermelho: #d70015; --sombra: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --fundo: #000000; --cartao: #1c1c1e; --borda: #2c2c2e; --texto: #f5f5f7; --suave: #8e8e93;
-      --icone-fundo: #f5f5f7; --icone: #000000; --sombra: none;
+      --icone-fundo: #f5f5f7; --icone: #000000; --vermelho: #ff453a; --sombra: none;
     }
   }
   * { box-sizing: border-box; }
@@ -30,6 +34,7 @@
   }
   main { max-width: 1040px; margin: 0 auto; }
   h1 { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 8px 4px 24px; }
+  h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 40px 4px 14px; }
   ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
   a {
     display: flex; align-items: center; gap: 14px; height: 100%;
@@ -42,48 +47,98 @@
   a:active { transform: scale(.97); }
   a:focus-visible { outline: 2px solid var(--texto); outline-offset: 2px; }
   .ic {
-    flex: none; width: 52px; height: 52px; border-radius: 13px;
+    position: relative; flex: none; width: 52px; height: 52px; border-radius: 13px;
     display: grid; place-items: center; background: var(--icone-fundo); color: var(--icone);
   }
   .ic svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .nome { font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
   .desc { font-size: 14px; color: var(--suave); margin-top: 2px; }
+  .fora .desc { color: var(--vermelho); font-weight: 500; }
+  .fora .ic::after {
+    content: ""; position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--vermelho); border: 2px solid var(--cartao);
+  }
+  .planilhas { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .planilhas a { padding: 12px 14px; border-radius: 14px; gap: 12px; }
+  .planilhas .ic { width: 36px; height: 36px; border-radius: 9px; background: transparent; color: var(--texto); border: 1px solid var(--borda); }
+  .planilhas .ic svg { width: 20px; height: 20px; }
+  .planilhas .nome { font-size: 15px; font-weight: 500; }
   @media (max-width: 480px) {
     h1 { font-size: 30px; margin-bottom: 18px; }
     ul { grid-template-columns: 1fr; gap: 10px; }
+    .planilhas { grid-template-columns: 1fr; gap: 8px; }
   }
 </style>
 </head>
 <body>
 <main>
   <h1>Meus apps</h1>
-  <!-- Para incluir um app: copie um <li> inteiro e troque o endereço, o nome e a frase. -->
+  <!--
+    Para incluir um app: copie um <li> inteiro e troque data-app (um nome curto, sem espaço), o endereço, o nome e a frase.
+    O robô de status (.github/workflows/status.yml) testa sozinho todo link que tem data-app.
+  -->
   <ul>
-    <li><a href="https://jpaapw-star.github.io/scan-app/" target="_blank" rel="noopener">
+    <li data-app="scan"><a href="https://jpaapw-star.github.io/scan-app/" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 8v8M11 8v8M14 8v8M17 8v8"/></svg></span>
       <span><div class="nome">SCAN</div><div class="desc">Ler produtos por foto</div></span></a></li>
 
-    <li><a href="https://jpaapw-star.github.io/painel/" target="_blank" rel="noopener">
+    <li data-app="painel"><a href="https://jpaapw-star.github.io/painel/" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg></span>
       <span><div class="nome">Painel EMANX</div><div class="desc">Produção, metas e qualidade</div></span></a></li>
 
-    <li><a href="https://script.google.com/macros/s/AKfycbzFCFxbdNCHE-TuF4ox7pM5LO_p_aKDsBDOesr__M0o-Hc9tPzyPRDapfEkNEUfMosVsQ/exec" target="_blank" rel="noopener">
+    <li data-app="preco"><a href="https://script.google.com/macros/s/AKfycbzFCFxbdNCHE-TuF4ox7pM5LO_p_aKDsBDOesr__M0o-Hc9tPzyPRDapfEkNEUfMosVsQ/exec" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="8" cy="8" r="1.5"/></svg></span>
       <span><div class="nome">Preço Médio</div><div class="desc">Média de venda e custo</div></span></a></li>
 
-    <li><a href="https://script.google.com/macros/s/AKfycbyJartOZ2D2KeLQ_IFelaF1pemHf1Xun0MlglVAE9UDTeQM8e847r32Yxfis3VL5BClsg/exec" target="_blank" rel="noopener">
+    <li data-app="manutencao"><a href="https://script.google.com/macros/s/AKfycbyJartOZ2D2KeLQ_IFelaF1pemHf1Xun0MlglVAE9UDTeQM8e847r32Yxfis3VL5BClsg/exec" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3.6 17.1a1.9 1.9 0 0 0 2.7 2.7l5.7-5.7a4 4 0 0 0 5.1-5.4l-2.5 2.5-2.4-.4-.4-2.4 2.9-2.1Z"/></svg></span>
       <span><div class="nome">Manutenção notebooks</div><div class="desc">Aparelhos em conserto</div></span></a></li>
 
-
-    <li><a href="https://script.google.com/macros/s/AKfycbwru0lyaMAu-8ru7gR3rLNVyPlndD__Fg2ppdDY2bNNBWNTRuN-HywQAeWaWw4WUWlVvw/exec" target="_blank" rel="noopener">
+    <li data-app="manuais"><a href="https://script.google.com/macros/s/AKfycbwru0lyaMAu-8ru7gR3rLNVyPlndD__Fg2ppdDY2bNNBWNTRuN-HywQAeWaWw4WUWlVvw/exec" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V5Z"/><path d="M4 21a2 2 0 0 1 2-2h12v2H6M9 8h6M9 11h4"/></svg></span>
       <span><div class="nome">Manuais Clicou</div><div class="desc">Manuais com QR</div></span></a></li>
 
-    <li><a href="https://script.google.com/macros/s/AKfycbyfOXgR0xm5gjeBmB14sxynENX6OyLQ9aZLOmLaWk03ZGx8FL-CtOFVnLDl2-TyDOIBXQ/exec" target="_blank" rel="noopener">
+    <li data-app="fotos"><a href="https://script.google.com/macros/s/AKfycbyfOXgR0xm5gjeBmB14sxynENX6OyLQ9aZLOmLaWk03ZGx8FL-CtOFVnLDl2-TyDOIBXQ/exec" target="_blank" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
       <span><div class="nome">Fotos da equipe</div><div class="desc">Foto de cada pessoa na planilha</div></span></a></li>
   </ul>
+
+  <h2>Planilhas</h2>
+  <ul class="planilhas">
+    <li><a href="https://docs.google.com/spreadsheets/d/1kRegA1mL5p4qYBTIaBPDLHhxiscTTHshuhcLBZjRaGs/edit" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
+      <span class="nome">Produção Informática</span></a></li>
+    <li><a href="https://docs.google.com/spreadsheets/d/1HaKEkxlznwSlRPW6ce3NfgSBVVn8677B7i3TOzytPgk/edit" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
+      <span class="nome">Produção Eletroeletrônicos</span></a></li>
+    <li><a href="https://docs.google.com/spreadsheets/d/1IgXP2qDv2vfByOGC5O3MKykYHVf8oe_hWVt70zm16sc/edit" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
+      <span class="nome">Manutenção notebooks</span></a></li>
+    <li><a href="https://docs.google.com/spreadsheets/d/1sCB4bhqsPXJqm8gaMJNAoZb2EmfGLaevwBvT_QLaQBA/edit" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
+      <span class="nome">Identificação EMANX</span></a></li>
+    <li><a href="https://docs.google.com/spreadsheets/d/11X5nXu6TMiK2e0omiS6-vXKmCce5gYgWTe6D5raaI8Q/edit" target="_blank" rel="noopener">
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
+      <span class="nome">Biblioteca de manuais</span></a></li>
+  </ul>
 </main>
+<script>
+/* Ponto vermelho: lê o status.json que o robô do GitHub grava a cada 30 min. Sem o arquivo, a página fica como está. */
+(function () {
+  var URL_STATUS = 'https://raw.githubusercontent.com/jpaapw-star/painel/main/apps/status.json';
+  function aplicar(s) {
+    if (!s || !s.apps) return;
+    Object.keys(s.apps).forEach(function (id) {
+      var st = s.apps[id], li = document.querySelector('li[data-app="' + id + '"]');
+      if (!li || !st || st.ok !== false) return;
+      li.classList.add('fora');
+      var d = li.querySelector('.desc');
+      if (d) d.textContent = 'Fora do ar';
+      li.querySelector('a').setAttribute('title', 'Sem resposta desde ' + new Date(st.desde).toLocaleString('pt-BR'));
+    });
+  }
+  try { fetch(URL_STATUS + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(aplicar).catch(function () {}); } catch (e) {}
+})();
+</script>
 </body>
 </html>

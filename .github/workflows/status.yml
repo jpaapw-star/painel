@@ -1,0 +1,38 @@
+name: Status dos apps
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['apps/index.html']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: status-apps
+  cancel-in-progress: false
+
+jobs:
+  checar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Testar os apps
+        run: node scripts/checar-apps.js
+      - name: Gravar se mudou
+        run: |
+          if [ -n "$(git status --porcelain apps/status.json)" ]; then
+            git config user.name "status-dos-apps"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add apps/status.json
+            git commit -m "Status dos apps"
+            git pull --rebase -q origin main
+            git push
+          fi
