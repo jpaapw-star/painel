@@ -1,0 +1,29 @@
+{
+  "apps": {
+    "scan": {
+      "ok": false,
+      "desde": "2026-11-20T13:32:52.268Z",
+      "motivo": "página de erro: /não foi possível abrir o arquivo/i"
+    },
+    "painel": {
+      "ok": true,
+      "desde": "2026-11-20T13:32:52.268Z"
+    },
+    "preco": {
+      "ok": true,
+      "desde": "2026-11-20T13:32:52.268Z"
+    },
+    "manutencao": {
+      "ok": true,
+      "desde": "2026-11-20T13:32:52.268Z"
+    },
+    "manuais": {
+      "ok": true,
+      "desde": "2026-11-20T13:32:52.268Z"
+    },
+    "fotos": {
+      "ok": true,
+      "desde": "2026-11-20T13:32:52.268Z"
+    }
+  }
+}
