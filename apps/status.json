@@ -1,9 +1,8 @@
 {
   "apps": {
     "scan": {
-      "ok": false,
-      "desde": "2026-11-20T13:32:52.268Z",
-      "motivo": "página de erro: /não foi possível abrir o arquivo/i"
+      "ok": true,
+      "desde": "2026-11-20T16:15:59.056Z"
     },
     "painel": {
       "ok": true,
