@@ -29,7 +29,11 @@ async function testar(url) {
       const r = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(30000) });
       const corpo = await r.text();
       if (r.status >= 400) throw new Error('HTTP ' + r.status);
-      const erro = ERROS.find((e) => e.test(corpo));
+      // Só páginas do Google Apps Script, e sem os <script> (o texto do próprio app fica neles;
+      // a página de erro do Google é HTML simples). Sites próprios (SCAN) só contam pelo código HTTP.
+      const doGoogle = /^https:\/\/script\.google\.com\//.test(url);
+      const visivel = corpo.replace(/<script[\s\S]*?<\/script>/gi, '');
+      const erro = doGoogle && ERROS.find((e) => e.test(visivel));
       if (erro) throw new Error('página de erro: ' + erro);
       return { ok: true };
     } catch (e) {
