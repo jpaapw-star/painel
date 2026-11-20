@@ -24,7 +24,8 @@
   var URL_DO_APP = 'https://script.google.com/macros/s/AKfycbyJH0Poi1gjWuChr36g5HuHNby_Xep6VPi1Nj16BxaLJsFH0rrpAS1fzVBBtXQdjSWKww/exec';
   var p = (new URLSearchParams(location.search).get('p') || 'producao').replace(/[^a-z]/g, '');
   var quadro = document.getElementById('painel');
-  quadro.src = URL_DO_APP + '?p=' + p + '&embutido=1';
+  var q = (new URLSearchParams(location.search).get('q') || '').slice(0, 80); // busca vinda do Meus apps
+  quadro.src = URL_DO_APP + '?p=' + p + '&embutido=1' + (q ? '&q=' + encodeURIComponent(q) : '');
 
   // manda um recado para o app (que fica alguns quadros para dentro)
   function espalhar(janela, recado) {

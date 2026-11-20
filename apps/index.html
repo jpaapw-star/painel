@@ -63,6 +63,28 @@
   .planilhas .ic { width: 36px; height: 36px; border-radius: 9px; background: transparent; color: var(--texto); border: 1px solid var(--borda); }
   .planilhas .ic svg { width: 20px; height: 20px; }
   .planilhas .nome { font-size: 15px; font-weight: 500; }
+  .busca { position: relative; margin: 0 0 12px; }
+  .busca svg { position: absolute; left: 14px; top: 50%; width: 20px; height: 20px; margin-top: -10px; fill: none; stroke: var(--suave); stroke-width: 2; stroke-linecap: round; }
+  .busca input {
+    width: 100%; height: 48px; padding: 0 16px 0 44px; border-radius: 14px; border: 1px solid var(--borda);
+    background: var(--cartao); color: var(--texto); font: inherit; font-size: 17px; -webkit-appearance: none; appearance: none;
+  }
+  .busca input::placeholder { color: var(--suave); }
+  .busca input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+  .busca input:focus { outline: 2px solid var(--texto); outline-offset: 1px; }
+  .destinos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .destinos a { height: 44px; padding: 0 16px; border-radius: 980px; font-size: 15px; font-weight: 500; gap: 8px; }
+  .destinos a.primeiro { background: var(--texto); color: var(--fundo); border-color: var(--texto); }
+  .filtros { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px 18px; padding: 0 16px; scrollbar-width: none; }
+  .filtros::-webkit-scrollbar { display: none; }
+  .filtros button {
+    flex: none; height: 40px; padding: 0 16px; border-radius: 980px; border: 1px solid var(--borda);
+    background: transparent; color: var(--texto); font: inherit; font-size: 15px; cursor: pointer;
+  }
+  .filtros button[aria-pressed="true"] { background: var(--texto); color: var(--fundo); border-color: var(--texto); }
+  li[hidden] { display: none; }
+  .dica { color: var(--suave); font-size: 14px; margin: 32px 4px 0; text-align: center; }
+  @media (min-width: 700px) { .filtros { margin: 0 0 18px; padding: 0; } }
   @media (max-width: 480px) {
     h1 { font-size: 30px; margin-bottom: 18px; }
     ul { grid-template-columns: 1fr; gap: 10px; }
@@ -73,58 +95,136 @@
 <body>
 <main>
   <h1>Meus apps</h1>
+  <form id="busca" class="busca" autocomplete="off" role="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Buscar serial, modelo ou pessoa" aria-label="Buscar serial, modelo ou pessoa" enterkeyhint="search" />
+  </form>
+  <div id="destinos" class="destinos" hidden></div>
+  <nav class="filtros" aria-label="Filtrar por área">
+    <button type="button" data-filtro="" aria-pressed="true">Tudo</button>
+    <button type="button" data-filtro="estoque" aria-pressed="false">Estoque</button>
+    <button type="button" data-filtro="manutencao" aria-pressed="false">Manutenção</button>
+    <button type="button" data-filtro="producao" aria-pressed="false">Produção</button>
+    <button type="button" data-filtro="gestao" aria-pressed="false">Gestão</button>
+  </nav>
   <!--
     Para incluir um app: copie um <li> inteiro e troque data-app (um nome curto, sem espaço), o endereço, o nome e a frase.
     O robô de status (.github/workflows/status.yml) testa sozinho todo link que tem data-app.
   -->
   <ul>
-    <li data-app="scan"><a href="https://jpaapw-star.github.io/scan-app/" target="_blank" rel="noopener">
+    <li data-app="scan"><a href="https://jpaapw-star.github.io/scan-app/" target="_blank" data-area="estoque" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 8v8M11 8v8M14 8v8M17 8v8"/></svg></span>
       <span><div class="nome">SCAN</div><div class="desc">Ler produtos por foto</div></span></a></li>
 
-    <li data-app="painel"><a href="https://jpaapw-star.github.io/painel/" target="_blank" rel="noopener">
+    <li data-app="painel"><a href="https://jpaapw-star.github.io/painel/" target="_blank" data-area="producao gestao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg></span>
       <span><div class="nome">Painel EMANX</div><div class="desc">Produção, metas e qualidade</div></span></a></li>
 
-    <li data-app="preco"><a href="https://script.google.com/macros/s/AKfycbzFCFxbdNCHE-TuF4ox7pM5LO_p_aKDsBDOesr__M0o-Hc9tPzyPRDapfEkNEUfMosVsQ/exec" target="_blank" rel="noopener">
+    <li data-app="preco"><a href="https://script.google.com/macros/s/AKfycbzFCFxbdNCHE-TuF4ox7pM5LO_p_aKDsBDOesr__M0o-Hc9tPzyPRDapfEkNEUfMosVsQ/exec" target="_blank" data-area="gestao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="8" cy="8" r="1.5"/></svg></span>
       <span><div class="nome">Preço Médio</div><div class="desc">Média de venda e custo</div></span></a></li>
 
-    <li data-app="manutencao"><a href="https://script.google.com/macros/s/AKfycbyJartOZ2D2KeLQ_IFelaF1pemHf1Xun0MlglVAE9UDTeQM8e847r32Yxfis3VL5BClsg/exec" target="_blank" rel="noopener">
+    <li data-app="manutencao"><a href="https://script.google.com/macros/s/AKfycbyJartOZ2D2KeLQ_IFelaF1pemHf1Xun0MlglVAE9UDTeQM8e847r32Yxfis3VL5BClsg/exec" target="_blank" data-area="manutencao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3.6 17.1a1.9 1.9 0 0 0 2.7 2.7l5.7-5.7a4 4 0 0 0 5.1-5.4l-2.5 2.5-2.4-.4-.4-2.4 2.9-2.1Z"/></svg></span>
       <span><div class="nome">Manutenção notebooks</div><div class="desc">Aparelhos em conserto</div></span></a></li>
 
-    <li data-app="manuais"><a href="https://script.google.com/macros/s/AKfycbwru0lyaMAu-8ru7gR3rLNVyPlndD__Fg2ppdDY2bNNBWNTRuN-HywQAeWaWw4WUWlVvw/exec" target="_blank" rel="noopener">
+    <li data-app="manuais"><a href="https://script.google.com/macros/s/AKfycbwru0lyaMAu-8ru7gR3rLNVyPlndD__Fg2ppdDY2bNNBWNTRuN-HywQAeWaWw4WUWlVvw/exec" target="_blank" data-area="estoque vendas" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V5Z"/><path d="M4 21a2 2 0 0 1 2-2h12v2H6M9 8h6M9 11h4"/></svg></span>
-      <span><div class="nome">Manuais Clicou</div><div class="desc">Manuais com QR</div></span></a></li>
+      <span><div class="nome">Manuais Clicou</div><div class="desc">Folha de manuais para o cliente</div></span></a></li>
 
-    <li data-app="fotos"><a href="https://script.google.com/macros/s/AKfycbyfOXgR0xm5gjeBmB14sxynENX6OyLQ9aZLOmLaWk03ZGx8FL-CtOFVnLDl2-TyDOIBXQ/exec" target="_blank" rel="noopener">
+    <li data-app="fotos"><a href="https://script.google.com/macros/s/AKfycbyfOXgR0xm5gjeBmB14sxynENX6OyLQ9aZLOmLaWk03ZGx8FL-CtOFVnLDl2-TyDOIBXQ/exec" target="_blank" data-area="gestao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
       <span><div class="nome">Fotos da equipe</div><div class="desc">Foto de cada pessoa na planilha</div></span></a></li>
   </ul>
 
   <h2>Planilhas</h2>
   <ul class="planilhas">
-    <li><a href="https://docs.google.com/spreadsheets/d/1kRegA1mL5p4qYBTIaBPDLHhxiscTTHshuhcLBZjRaGs/edit" target="_blank" rel="noopener">
+    <li><a href="https://docs.google.com/spreadsheets/d/1kRegA1mL5p4qYBTIaBPDLHhxiscTTHshuhcLBZjRaGs/edit" target="_blank" data-area="producao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
       <span class="nome">Produção Informática</span></a></li>
-    <li><a href="https://docs.google.com/spreadsheets/d/1HaKEkxlznwSlRPW6ce3NfgSBVVn8677B7i3TOzytPgk/edit" target="_blank" rel="noopener">
+    <li><a href="https://docs.google.com/spreadsheets/d/1HaKEkxlznwSlRPW6ce3NfgSBVVn8677B7i3TOzytPgk/edit" target="_blank" data-area="producao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
       <span class="nome">Produção Eletroeletrônicos</span></a></li>
-    <li><a href="https://docs.google.com/spreadsheets/d/1IgXP2qDv2vfByOGC5O3MKykYHVf8oe_hWVt70zm16sc/edit" target="_blank" rel="noopener">
+    <li><a href="https://docs.google.com/spreadsheets/d/1IgXP2qDv2vfByOGC5O3MKykYHVf8oe_hWVt70zm16sc/edit" target="_blank" data-area="manutencao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
       <span class="nome">Defeitos notebooks</span></a></li>
-    <li><a href="https://docs.google.com/spreadsheets/d/10zHHWjV6Xva7ojDr7GpGRe_NuJufYZ62qhpwhMU3Hcs/edit" target="_blank" rel="noopener">
+    <li><a href="https://docs.google.com/spreadsheets/d/10zHHWjV6Xva7ojDr7GpGRe_NuJufYZ62qhpwhMU3Hcs/edit" target="_blank" data-area="manutencao producao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
       <span class="nome">Produção manutenção notebooks</span></a></li>
-    <li><a href="https://docs.google.com/spreadsheets/d/1sCB4bhqsPXJqm8gaMJNAoZb2EmfGLaevwBvT_QLaQBA/edit" target="_blank" rel="noopener">
+    <li><a href="https://docs.google.com/spreadsheets/d/1sCB4bhqsPXJqm8gaMJNAoZb2EmfGLaevwBvT_QLaQBA/edit" target="_blank" data-area="gestao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
       <span class="nome">Identificação EMANX</span></a></li>
-    <li><a href="https://drive.google.com/drive/folders/1ylxVBfhcgMreIgtbDUoGFyfBufW1jBVd" target="_blank" rel="noopener">
+    <li><a href="https://drive.google.com/drive/folders/1ylxVBfhcgMreIgtbDUoGFyfBufW1jBVd" target="_blank" data-area="estoque vendas" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span>
       <span class="nome">Manuais no Drive</span></a></li>
   </ul>
+  <p class="dica">Abriu com a conta Google errada? Toque e segure o app e escolha abrir em aba privada.</p>
 </main>
+<script>
+/* Busca única, ordem por uso e filtro por área. Tudo fica só neste aparelho. */
+(function () {
+  function ler(k, padrao) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
+  function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  // 1) Apps mais usados neste aparelho sobem para o topo (empate = ordem original).
+  var usos = ler('meusapps:usos', {});
+  var lista = document.querySelector('ul:not(.planilhas)');
+  var itens = Array.prototype.slice.call(lista.children);
+  itens.forEach(function (li, i) { li.dataset.ordem = i; });
+  itens.sort(function (a, b) { return (usos[b.dataset.app] || 0) - (usos[a.dataset.app] || 0) || a.dataset.ordem - b.dataset.ordem; })
+    .forEach(function (li) { lista.appendChild(li); });
+  lista.addEventListener('click', function (ev) {
+    var li = ev.target.closest('li[data-app]'); if (!li) return;
+    usos[li.dataset.app] = (usos[li.dataset.app] || 0) + 1; gravar('meusapps:usos', usos);
+  });
+
+  // 2) Filtro por área (lembra o último escolhido).
+  var botoes = Array.prototype.slice.call(document.querySelectorAll('.filtros button'));
+  function filtrar(area) {
+    botoes.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.filtro === area)); });
+    document.querySelectorAll('main li').forEach(function (li) {
+      var a = li.querySelector('a'); var areas = (a && a.dataset.area || '').split(' ');
+      li.hidden = !!area && areas.indexOf(area) < 0;
+    });
+    document.querySelectorAll('main h2').forEach(function (h) {
+      var ul = h.nextElementSibling; h.hidden = !!ul && !ul.querySelector('li:not([hidden])');
+    });
+    gravar('meusapps:filtro', area);
+  }
+  botoes.forEach(function (b) { b.addEventListener('click', function () { filtrar(b.dataset.filtro); }); });
+  filtrar(ler('meusapps:filtro', ''));
+
+  // 3) Busca única: mostra onde procurar, o mais provável primeiro.
+  var APPS = {
+    manutencao: { nome: 'Manutenção', url: document.querySelector('li[data-app="manutencao"] a').href },
+    painel: { nome: 'Painel EMANX', url: document.querySelector('li[data-app="painel"] a').href },
+    fotos: { nome: 'Fotos da equipe', url: document.querySelector('li[data-app="fotos"] a').href }
+  };
+  var q = document.getElementById('q'), destinos = document.getElementById('destinos');
+  function ondeProcurar(t) {
+    var temDigito = /\d/.test(t), temLetra = /[a-zà-ú]/i.test(t);
+    if (temDigito) return ['manutencao'];                      // serial, modelo ou patrimônio
+    if (temLetra && t.split(/\s+/).length >= 1) return ['painel', 'fotos', 'manutencao']; // nome de pessoa ou modelo
+    return ['manutencao'];
+  }
+  function montar() {
+    var t = q.value.trim();
+    destinos.innerHTML = ''; destinos.hidden = !t;
+    if (!t) return;
+    ondeProcurar(t).forEach(function (id, i) {
+      var a = document.createElement('a'); var app = APPS[id];
+      a.href = app.url + (app.url.indexOf('?') < 0 ? '?' : '&') + 'q=' + encodeURIComponent(t);
+      a.target = '_blank'; a.rel = 'noopener'; if (i === 0) a.className = 'primeiro';
+      a.textContent = 'Procurar em ' + app.nome;
+      destinos.appendChild(a);
+    });
+  }
+  q.addEventListener('input', montar);
+  document.getElementById('busca').addEventListener('submit', function (ev) {
+    ev.preventDefault(); var a = destinos.querySelector('a'); if (a) a.click();
+  });
+})();
+</script>
 <script>
 /* Ponto vermelho: lê o status.json que o robô do GitHub grava a cada 30 min. Sem o arquivo, a página fica como está. */
 (function () {
