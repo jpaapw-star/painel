@@ -34,7 +34,7 @@
     padding: max(32px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
   main { max-width: 1040px; margin: 0 auto; }
-  h1 { display: flex; align-items: center; gap: 12px; font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 8px 4px 24px; }
+  h1 { display: flex; align-items: center; gap: 12px; font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin: 8px 4px 24px; }
   h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 40px 4px 14px; }
   ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
   a {
@@ -64,7 +64,7 @@
   .planilhas .ic { width: 36px; height: 36px; border-radius: 9px; background: transparent; color: var(--texto); border: 1px solid var(--borda); }
   .planilhas .ic svg { width: 20px; height: 20px; }
   .planilhas .nome { font-size: 15px; font-weight: 500; }
-  h1 .logo { width: 40px; height: 40px; border-radius: 10px; flex: none; box-shadow: 0 0 0 1px var(--borda); }
+  h1 .logo { width: 36px; height: 36px; border-radius: 10px; flex: none; box-shadow: 0 0 0 1px var(--borda); }
   .busca { position: relative; margin: 0 0 12px; }
   .busca svg { position: absolute; left: 14px; top: 50%; width: 20px; height: 20px; margin-top: -10px; fill: none; stroke: var(--suave); stroke-width: 2; stroke-linecap: round; }
   .busca input {
@@ -74,21 +74,21 @@
   .busca input::placeholder { color: var(--suave); }
   .busca input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
   .busca input:focus { outline: 2px solid var(--texto); outline-offset: 1px; }
+  .destinos-dica { color: var(--suave); font-size: 14px; margin: -4px 4px 10px; }
+  .sub { color: var(--suave); font-size: 14px; margin: -8px 4px 12px; }
   .destinos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
   .destinos a { height: 44px; padding: 0 16px; border-radius: 980px; font-size: 15px; font-weight: 500; gap: 8px; }
   .destinos a.primeiro { background: var(--texto); color: var(--fundo); border-color: var(--texto); }
-  .filtros { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px 18px; padding: 0 16px; scrollbar-width: none; }
-  .filtros::-webkit-scrollbar { display: none; }
+  .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
   .filtros button {
-    flex: none; height: 40px; padding: 0 16px; border-radius: 980px; border: 1px solid var(--borda);
+    flex: none; height: 44px; padding: 0 16px; border-radius: 980px; border: 1px solid var(--borda);
     background: transparent; color: var(--texto); font: inherit; font-size: 15px; cursor: pointer;
   }
   .filtros button[aria-pressed="true"] { background: var(--texto); color: var(--fundo); border-color: var(--texto); }
   li[hidden] { display: none; }
   .dica { color: var(--suave); font-size: 14px; margin: 32px 4px 0; text-align: center; }
-  @media (min-width: 700px) { .filtros { margin: 0 0 18px; padding: 0; } }
   @media (max-width: 480px) {
-    h1 { font-size: 30px; margin-bottom: 18px; }
+    h1 { margin-bottom: 18px; }
     ul { grid-template-columns: 1fr; gap: 10px; }
     .planilhas { grid-template-columns: 1fr; gap: 8px; }
   }
@@ -96,12 +96,13 @@
 </head>
 <body>
 <main>
-  <h1><img class="logo" src="favicon.svg" alt="" width="40" height="40" />Meus apps</h1>
+  <h1><img class="logo" src="favicon.svg" alt="" width="36" height="36" />Meus apps</h1>
   <form id="busca" class="busca" autocomplete="off" role="search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="q" type="search" placeholder="Buscar serial, modelo ou pessoa" aria-label="Buscar serial, modelo ou pessoa" enterkeyhint="search" />
   </form>
   <div id="destinos" class="destinos" hidden></div>
+  <p id="destinosDica" class="destinos-dica" hidden>O app abre já procurando o que você digitou.</p>
   <nav class="filtros" aria-label="Filtrar por área">
     <button type="button" data-filtro="" aria-pressed="true">Tudo</button>
     <button type="button" data-filtro="estoque" aria-pressed="false">Estoque</button>
@@ -140,6 +141,7 @@
   </ul>
 
   <h2>Planilhas</h2>
+  <p class="sub">Abrem para quem tem acesso a cada uma.</p>
   <ul class="planilhas">
     <li><a href="https://docs.google.com/spreadsheets/d/1kRegA1mL5p4qYBTIaBPDLHhxiscTTHshuhcLBZjRaGs/edit" target="_blank" data-area="producao" rel="noopener">
       <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16M10 10v10"/></svg></span>
@@ -160,7 +162,7 @@
       <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span>
       <span class="nome">Manuais no Drive</span></a></li>
   </ul>
-  <p class="dica">Conta Google errada? Segure o app e abra em aba privada.</p>
+  <p class="dica">Abriu com a conta Google errada? Toque e segure no app e escolha “Abrir em aba anônima” (no iPhone, “Nova Aba Privada”). Lá, entre com a conta certa.</p>
 </main>
 <script>
 /* Busca única, ordem por uso e filtro por área. Tudo fica só neste aparelho. */
@@ -198,6 +200,7 @@
 
   // 3) Busca única: mostra onde procurar, o mais provável primeiro.
   var APPS = {
+    scan: { nome: 'SCAN', url: document.querySelector('li[data-app="scan"] a').href },
     manutencao: { nome: 'Manutenção', url: document.querySelector('li[data-app="manutencao"] a').href },
     painel: { nome: 'Painel EMANX', url: document.querySelector('li[data-app="painel"] a').href },
     fotos: { nome: 'Fotos da equipe', url: document.querySelector('li[data-app="fotos"] a').href }
@@ -205,19 +208,19 @@
   var q = document.getElementById('q'), destinos = document.getElementById('destinos');
   function ondeProcurar(t) {
     var temDigito = /\d/.test(t), temLetra = /[a-zà-ú]/i.test(t);
-    if (temDigito) return ['manutencao'];                      // serial, modelo ou patrimônio
-    if (temLetra && t.split(/\s+/).length >= 1) return ['painel', 'fotos', 'manutencao']; // nome de pessoa ou modelo
-    return ['manutencao'];
+    if (temDigito) return ['scan', 'manutencao'];              // serial, EAN ou modelo: estoque e conserto
+    if (temLetra && t.split(/\s+/).length >= 1) return ['painel', 'fotos', 'scan', 'manutencao']; // nome de pessoa ou modelo
+    return ['scan', 'manutencao'];
   }
   function montar() {
     var t = q.value.trim();
-    destinos.innerHTML = ''; destinos.hidden = !t;
+    destinos.innerHTML = ''; destinos.hidden = !t; document.getElementById('destinosDica').hidden = !t;
     if (!t) return;
     ondeProcurar(t).forEach(function (id, i) {
       var a = document.createElement('a'); var app = APPS[id];
       a.href = app.url + (app.url.indexOf('?') < 0 ? '?' : '&') + 'q=' + encodeURIComponent(t);
       a.target = '_blank'; a.rel = 'noopener'; if (i === 0) a.className = 'primeiro';
-      a.textContent = 'Procurar em ' + app.nome;
+      a.textContent = { scan: 'Ver no SCAN', manutencao: 'Ver no conserto', painel: 'Ver no Painel EMANX', fotos: 'Ver nas fotos' }[id];
       destinos.appendChild(a);
     });
   }
