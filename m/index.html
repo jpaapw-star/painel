@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Manual do produto · Clicou Shops</title>
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
+<link rel="icon" href="../apps/favicon.svg" type="image/svg+xml" />
+<style>
+  /* Página que o cliente abre pelo QR da folha: mostra o manual dentro da página (o Android não baixa o arquivo). */
+  :root { --fundo:#f5f5f7; --cartao:#fff; --borda:#e3e3e6; --texto:#1d1d1f; --suave:#6e6e73; --botao:#1d1d1f; --nobotao:#fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fundo:#000; --cartao:#1c1c1e; --borda:#2c2c2e; --texto:#f5f5f7; --suave:#8e8e93; --botao:#f5f5f7; --nobotao:#000; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--fundo); color: var(--texto); }
+  body { font: 400 16px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); -webkit-font-smoothing: antialiased; }
+  main { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .loja { font-size: 15px; color: var(--suave); font-weight: 600; letter-spacing: .02em; }
+  h1 { font-size: 24px; line-height: 1.2; margin: 0; letter-spacing: -.01em; }
+  .lista { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lista button, .acoes a { font: inherit; font-size: 15px; font-weight: 600; min-height: 44px; padding: 10px 16px; border-radius: 980px;
+    border: 1px solid var(--texto); background: var(--cartao); color: var(--texto); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+  .lista button[aria-pressed="true"] { background: var(--botao); color: var(--nobotao); border-color: var(--botao); }
+  .visor { background: var(--cartao); border: 1px solid var(--borda); border-radius: 14px; overflow: hidden; }
+  .visor iframe { display: block; width: 100%; height: 78vh; min-height: 420px; border: 0; background: #fff; }
+  .acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .acoes a.prim { background: var(--botao); color: var(--nobotao); border-color: var(--botao); }
+  .aviso { font-size: 15px; color: var(--suave); margin: 0; }
+  .rodape { font-size: 13px; color: var(--suave); margin-top: 8px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--texto); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="loja">CLICOU SHOPS</div>
+  <h1 id="nome">Abrindo o manual…</h1>
+  <p class="aviso" id="aviso" role="status">Só um instante.</p>
+  <div class="lista" id="lista" role="group" aria-label="Manuais deste produto"></div>
+  <div class="visor" id="visor" hidden><iframe id="quadro" title="Manual" allow="fullscreen"></iframe></div>
+  <div class="acoes" id="acoes"></div>
+  <p class="rodape">Dúvidas sobre o produto? Fale com a loja onde você comprou.</p>
+</main>
+<script>
+// Endereço do app Manuais Clicou (Apps Script). Ele responde com os manuais atuais do código do QR.
+const APP = 'https://script.google.com/macros/s/AKfycbwru0lyaMAu-8ru7gR3rLNVyPlndD__Fg2ppdDY2bNNBWNTRuN-HywQAeWaWw4WUWlVvw/exec';
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+// aceita ?c=2s&m=1 e também o atalho digitado ?2s
+const codigo = (q.get('c') || (location.search.slice(1).split('&')[0].includes('=') ? '' : location.search.slice(1).split('&')[0]) || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const qual = Math.max(0, (parseInt(q.get('m'), 10) || 1) - 1);
+const idDrive = u => { const m = String(u || '').match(/drive\.google\.com\/(?:file\/d\/|uc\?(?:[^#]*&)?id=|open\?id=)([\w-]{10,})/); return m ? m[1] : ''; };
+
+function mostrar(dados, i) {
+  const ms = dados.manuais || [];
+  const m = ms[i] || ms[0];
+  [...$('lista').children].forEach((b, k) => b.setAttribute('aria-pressed', String(ms[k] === m)));
+  const id = idDrive(m.link);
+  $('acoes').innerHTML = '';
+  const botao = (txt, href, prim) => { const a = document.createElement('a'); a.textContent = txt; a.href = href; a.target = '_blank'; a.rel = 'noopener'; if (prim) a.className = 'prim'; $('acoes').append(a); };
+  if (id) {
+    $('quadro').src = 'https://drive.google.com/file/d/' + id + '/preview';
+    $('quadro').title = m.rotulo;
+    $('visor').hidden = false;
+    $('aviso').textContent = m.rotulo + '. Role dentro do quadro para ler.';
+    botao('Abrir em tela cheia', 'https://drive.google.com/file/d/' + id + '/view', true);
+    botao('Salvar no celular', 'https://drive.google.com/uc?export=download&id=' + id);
+  } else {
+    // manual que ficou no site do fabricante (sem cópia no Drive)
+    $('visor').hidden = true;
+    $('aviso').textContent = m.rotulo + ' fica no site do fabricante.';
+    botao('Abrir o manual', m.link, true);
+  }
+}
+
+function pronto(dados) {
+  if (!dados || dados.erro || !(dados.manuais || []).length) {
+    $('nome').textContent = 'Manual não encontrado';
+    $('aviso').textContent = 'Este QR não tem manual agora. Fale com a loja onde você comprou.';
+    return;
+  }
+  $('nome').textContent = dados.nome;
+  document.title = 'Manual · ' + dados.nome;
+  if (dados.manuais.length > 1) dados.manuais.forEach((m, k) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = m.rotulo;
+    b.addEventListener('click', () => mostrar(dados, k)); $('lista').append(b);
+  });
+  mostrar(dados, qual);
+}
+
+function falhou() {
+  $('nome').textContent = 'Não abriu agora';
+  $('aviso').textContent = 'A internet ou o servidor não respondeu. ';
+  const b = document.createElement('a'); b.href = location.href; b.textContent = 'Tentar de novo'; $('aviso').append(b);
+}
+
+if (!codigo) { $('nome').textContent = 'QR sem código'; $('aviso').textContent = 'Fale com a loja onde você comprou.'; }
+else {
+  // JSONP: funciona em qualquer navegador, sem login e sem bloqueio entre sites
+  const t = setTimeout(falhou, 20000);
+  window.__manuais = d => { clearTimeout(t); pronto(d); };
+  const s = document.createElement('script');
+  s.src = APP + '?qr=' + encodeURIComponent(codigo) + '&callback=__manuais';
+  s.onerror = () => { clearTimeout(t); falhou(); };
+  document.body.append(s);
+}
+</script>
+</body>
+</html>
