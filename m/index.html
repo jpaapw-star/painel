@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Manual do produto · Clicou Shops</title>
+<meta name="description" content="Manual do produto que você comprou na Clicou Shops." />
+<meta property="og:title" content="Manual do produto · Clicou Shops" />
+<meta property="og:description" content="Toque para abrir o manual do seu produto." />
+<meta property="og:site_name" content="Clicou Shops" />
+<meta property="og:type" content="website" />
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
 <link rel="icon" href="../apps/favicon.svg" type="image/svg+xml" />
@@ -26,7 +31,8 @@
     border: 1px solid var(--texto); background: var(--cartao); color: var(--texto); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
   .lista button[aria-pressed="true"] { background: var(--botao); color: var(--nobotao); border-color: var(--botao); }
   .visor { background: var(--cartao); border: 1px solid var(--borda); border-radius: 14px; overflow: hidden; }
-  .visor iframe { display: block; width: 100%; height: 78vh; min-height: 420px; border: 0; background: #fff; }
+  /* quadro com a altura da tela: no celular quem rola é o PDF, não a página */
+  .visor iframe { display: block; width: 100%; height: calc(100vh - 250px); height: calc(100dvh - 250px); min-height: 360px; border: 0; background: #fff; }
   .acoes { display: flex; flex-wrap: wrap; gap: 8px; }
   .acoes a.prim { background: var(--botao); color: var(--nobotao); border-color: var(--botao); }
   .aviso { font-size: 15px; color: var(--suave); margin: 0; }
@@ -51,7 +57,11 @@ const $ = id => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 // aceita ?c=2s&m=1 e também o atalho digitado ?2s
 const codigo = (q.get('c') || (location.search.slice(1).split('&')[0].includes('=') ? '' : location.search.slice(1).split('&')[0]) || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-const qual = Math.max(0, (parseInt(q.get('m'), 10) || 1) - 1);
+const pedido = String(q.get('m') || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+// m = id fixo do manual (folhas novas) ou a posição 1, 2, 3 (folhas de antes)
+const qual = ms => { const k = ms.findIndex(x => x.id && x.id === pedido); if (k >= 0) return k; const n = parseInt(pedido, 10); return n >= 1 && n <= ms.length && String(n) === pedido ? n - 1 : 0; };
+const guardar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const lembrado = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
 const idDrive = u => { const m = String(u || '').match(/drive\.google\.com\/(?:file\/d\/|uc\?(?:[^#]*&)?id=|open\?id=)([\w-]{10,})/); return m ? m[1] : ''; };
 
 function mostrar(dados, i) {
@@ -67,7 +77,8 @@ function mostrar(dados, i) {
     $('visor').hidden = false;
     $('aviso').textContent = m.rotulo + '. Role dentro do quadro para ler.';
     botao('Abrir em tela cheia', 'https://drive.google.com/file/d/' + id + '/view', true);
-    botao('Salvar no celular', 'https://drive.google.com/uc?export=download&id=' + id);
+    // PDF enorme: o "baixar" do Google mostra um aviso de vírus em inglês; o visualizador tem o próprio botão de baixar
+    botao('Salvar no celular', m.grande ? 'https://drive.google.com/file/d/' + id + '/view' : 'https://drive.google.com/uc?export=download&id=' + id);
   } else {
     // manual que ficou no site do fabricante (sem cópia no Drive)
     $('visor').hidden = true;
@@ -88,10 +99,12 @@ function pronto(dados) {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = m.rotulo;
     b.addEventListener('click', () => mostrar(dados, k)); $('lista').append(b);
   });
-  mostrar(dados, qual);
+  mostrar(dados, qual(dados.manuais));
 }
 
 function falhou() {
+  const velho = lembrado('man:' + codigo); // já abriu antes neste celular: mostra o que tinha
+  if (velho && velho.manuais) { pronto(velho); return; }
   $('nome').textContent = 'Não abriu agora';
   $('aviso').textContent = 'A internet ou o servidor não respondeu. ';
   const b = document.createElement('a'); b.href = location.href; b.textContent = 'Tentar de novo'; $('aviso').append(b);
@@ -99,13 +112,22 @@ function falhou() {
 
 if (!codigo) { $('nome').textContent = 'QR sem código'; $('aviso').textContent = 'Fale com a loja onde você comprou.'; }
 else {
-  // JSONP: funciona em qualquer navegador, sem login e sem bloqueio entre sites
-  const t = setTimeout(falhou, 20000);
-  window.__manuais = d => { clearTimeout(t); pronto(d); };
-  const s = document.createElement('script');
-  s.src = APP + '?qr=' + encodeURIComponent(codigo) + '&callback=__manuais';
-  s.onerror = () => { clearTimeout(t); falhou(); };
-  document.body.append(s);
+  // conta a leitura uma vez por dia neste celular, e não conta quem veio pelo WhatsApp
+  const hoje = 'lido:' + codigo + ':' + new Date().toISOString().slice(0, 10);
+  const conta = !q.get('o') && !lembrado(hoje);
+  // JSONP: funciona em qualquer navegador, sem login e sem bloqueio entre sites.
+  // Se o Google demorar ou devolver uma página de erro, desiste em 8 s e tenta mais uma vez.
+  let feito = false;
+  const tentar = vez => {
+    const cb = '__manuais' + vez;
+    const t = setTimeout(() => { if (feito) return; if (vez < 2) tentar(vez + 1); else falhou(); }, vez < 2 ? 8000 : 12000);
+    window[cb] = d => { if (feito) return; feito = true; clearTimeout(t); if (d && d.manuais) guardar('man:' + codigo, d); if (conta) guardar(hoje, 1); pronto(d); };
+    const s = document.createElement('script');
+    s.src = APP + '?qr=' + encodeURIComponent(codigo) + '&callback=' + cb + (conta && vez === 1 ? '&conta=1' : '');
+    s.onerror = () => { clearTimeout(t); if (feito) return; if (vez < 2) tentar(vez + 1); else falhou(); };
+    document.body.append(s);
+  };
+  tentar(1);
 }
 </script>
 </body>
